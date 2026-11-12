@@ -45,9 +45,14 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         if: steps.esp8266_1.outcome == 'success' && steps.esp32_1.outcome == 'success'
         run: bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "success"
+      - name: Copy Binaries
+       run: |
+        mkdir -p output_bins
+        find /tmp -name "*.bin" -exec cp {} output_bins/ \;
+        find . -path "./.pio/build/*" -name "*.bin" -exec cp {} output_bins/ \;
       - name: Upload Binaries
-        uses: actions/upload-artifact@v4
-        with:
-          name: esp3d-binaries
-          path: |
-            **/*.bin
+      uses: actions/upload-artifact@v4
+      with:
+        name: esp32-binaries
+        path: output_bins/*.bin
+
