@@ -49,11 +49,14 @@ jobs:
     - name: Copy Binaries
       run: |
         mkdir -p output_bins
-        find /tmp -name "*.bin" -exec cp {} output_bins/ \;
-        find . -path "./.pio/build/*" -name "*.bin" -exec cp {} output_bins/ \;
+        find / -name "*esp3d*.bin" -o -name "*firmware*.bin" 2>/dev/null | xargs -I {} cp {} output_bins/ || true
+        find /tmp -name "*.bin" 2>/dev/null | xargs -I {} cp {} output_bins/ || true
+        find . -name "*.bin" 2>/dev/null | xargs -I {} cp {} output_bins/ || true
+        ls -la output_bins/
     - name: Upload Binaries
       uses: actions/upload-artifact@v4
       with:
         name: esp32-binaries
-        path: output_bins/*.bin
+        path: output_bins/
+        if-no-files-found: warn
 
